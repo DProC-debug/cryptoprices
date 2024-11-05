@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Prices</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap"
+        rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
+        integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
+        crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <link rel="stylesheet" href="/main/styles.css">
+</head>
+
+<body>
+    <div class="crypto-box">
+
+        <img class="circle-img" src="https://aleo.org/homepage.png" alt="circle">
+
+        <h1 class="user-name">Crypto Prices</h1>
+
+        <div class="pdiv">
+            <p class="crypto-p">You can check crypto prices here</p>
+        </div>
+        
+     <div class="search-container">
+        <form method="GET" action="/search">
+            <input name="search" id="search" placeholder="Search..." type="search" autocomplete="off" onkeyup="myFunction()">
+        </form>
+        <div id="suggestions"></div>
+     </div>
+
+      <div class="twobox">
+
+
+        <div class="cryptobox firstbox">
+
+            <div>
+                <div class="each-box">
+                    <div>Rank</div>
+                    <div></div>
+                    <div>
+                        Coin
+                    </div>
+                    <div class="coin-price">Price</div>
+                </div>
+                <hr class="crypto-row">
+                <div class="each-box">
+                    <div>
+                        <%= bitcoin.market_cap_rank %>
+                    </div>
+                    <div><img class="crypto-image" src="<%= bitcoin.image %>" alt="btc-img"></div>
+                    <div>
+                        <%= bitcoin.name %>
+                    </div>
+                    <div class="coin-price">$<%= bitcoin.current_price %>
+                    </div>
+                </div>
+                <hr class="crypto-row">
+                <div class="each-box">
+                    <div>
+                        <%= ethereum.market_cap_rank %>
+                    </div>
+                    <div><img class="crypto-image" src="<%= ethereum.image %>" alt="eth-img"></div>
+                    <div>
+                        <%= ethereum.name %>
+                    </div>
+                    <div class="coin-price">$<%= ethereum.current_price %>
+                    </div>
+                </div>
+                <hr class="crypto-row">
+                <div class="each-box">
+                    <div>
+                        <%= solana.market_cap_rank %>
+                    </div>
+                    <div><img class="crypto-image" src="<%= solana.image %>" alt="sol-img"></div>
+                    <div>
+                        <%= solana.name %>
+                    </div>
+                    <div class="coin-price">$<%= solana.current_price %>
+                    </div>
+                </div>
+                <hr class="crypto-row">
+                <div class="each-box">
+                    <div>
+                        <%= zero.market_cap_rank %>
+                    </div>
+                    <div><img class="crypto-image" src="<%= zero.image %>" alt="zero-img"></div>
+                    <div>
+                        <%= zero.name %>
+                    </div>
+                    <div class="coin-price">$<%= zero.current_price %>
+                    </div>
+                </div>
+                <hr class="crypto-row">
+                <div class="each-box">
+                    <div>
+                        <%= bonkinu.market_cap_rank %>
+                    </div>
+                    <div><img class="crypto-image" src="<%= bonkinu.image %>" alt="bonk-img"></div>
+                    <div>
+                        <%= bonkinu.name %>
+                    </div>
+                    <div class="coin-price">$<%= bonkinu.current_price %>
+                    </div>
+                </div>
+                <hr class="crypto-row">
+                <div class="each-box">
+                    <div>
+                        <%= notcoin.market_cap_rank %>
+                    </div>
+                    <div><img class="crypto-image" src="<%= notcoin.image %>" alt="not-img"></div>
+                    <div>
+                        <%= notcoin.name %>
+                    </div>
+                    <div class="coin-price">$<%= notcoin.current_price %>
+                    </div>
+                </div>
+                <hr class="crypto-row">
+                <div class="each-box">
+                    <div>
+                        <%= catizen.market_cap_rank %>
+                    </div>
+                    <div><img class="crypto-image" src="<%= catizen.image %>" alt="cati-img"></div>
+                    <div>
+                        <%= catizen.name %>
+                    </div>
+                    <div class="coin-price">$<%= catizen.current_price %>
+                    </div>
+                </div>
+                <hr class="crypto-row">
+                <div class="each-box">
+                    <div>
+                        <%= pop.market_cap_rank %>
+                    </div>
+                    <div><img class="crypto-image" src="<%= pop.image %>" alt="pop-img"></div>
+                    <div>
+                        <%= pop.name %>
+                    </div>
+                    <div class="coin-price">$<%= pop.current_price %>
+                    </div>
+                </div>
+                <hr class="crypto-row">
+                <div class="each-box">
+                    <div>
+                        <%= zetachain.market_cap_rank %>
+                    </div>
+                    <div><img class="crypto-image" src="<%= zetachain.image %>" alt="zeta-img"></div>
+                    <div>
+                        <%= zetachain.name %>
+                    </div>
+                    <div class="coin-price">$<%= zetachain.current_price %>
+                    </div>
+                </div>
+                <hr class="crypto-row">
+                <div class="each-box">
+                    <div>
+                        <%= neirocoin.market_cap_rank %>
+                    </div>
+                    <div><img class="crypto-image" src="<%= neirocoin.image %>" alt="neiro-img"></div>
+                    <div>
+                        <%= neirocoin.name %>
+                    </div>
+                    <div class="coin-price">$<%= neirocoin.current_price %>
+                    </div>
+                </div>
+                
+
+            </div>
+
+        </div>
+
+
+        <div class="cryptobox secondbox">
+
+            <div>
+        
+
+                <div class="each-box nomobile">
+                    <div>Rank</div>
+                    <div></div>
+                    <div>
+                        Coin
+                    </div>
+                    <div class="coin-price">Price</div>
+                </div>
+                <hr class="crypto-row nomobile">
+                
+                <div class="each-box">
+                    <div>
+                        <%= aptos.market_cap_rank %>
+                    </div>
+                    <div><img class="crypto-image" src="<%= aptos.image %>" alt="aptos-img"></div>
+                    <div>
+                        <%= aptos.name %>
+                    </div>
+                    <div class="coin-price">$<%= aptos.current_price %>
+                    </div>
+                </div>
+                <hr class="crypto-row">
+                <div class="each-box">
+                    <div>
+                        <%= sui.market_cap_rank %>
+                    </div>
+                    <div><img class="crypto-image" src="<%= sui.image %>" alt="sui-img"></div>
+                    <div>
+                        <%= sui.name %>
+                    </div>
+                    <div class="coin-price">$<%= sui.current_price %>
+                    </div>
+                </div>
+                <hr class="crypto-row">
+                <div class="each-box">
+                <div>
+                    <%= pepe.market_cap_rank %>
+                </div>
+                <div><img class="crypto-image" src="<%= pepe.image %>" alt="pepe-img"></div>
+                <div>
+                    <%= pepe.name %>
+                </div>
+                <div class="coin-price">$<%= pepe.current_price %>
+                </div>
+                </div>
+                <hr class="crypto-row">
+                <div class="each-box">
+                    <div>
+                        <%= bittensor.market_cap_rank %>
+                    </div>
+                    <div><img class="crypto-image" src="<%= bittensor.image %>" alt="bittensor-img"></div>
+                    <div>
+                        <%= bittensor.name %>
+                    </div>
+                    <div class="coin-price">$<%= bittensor.current_price %>
+                    </div>
+                </div>
+                <hr class="crypto-row">
+                <div class="each-box">
+                    <div>
+                        <%= tether.market_cap_rank %>
+                    </div>
+                    <div><img class="crypto-image" src="<%= tether.image %>" alt="tether-img"></div>
+                    <div>
+                        <%= tether.name %>
+                    </div>
+                    <div class="coin-price">$<%= tether.current_price %>
+                    </div>
+                </div>
+                <hr class="crypto-row">
+                <div class="each-box">
+                    <div>
+                        <%= arbitrum.market_cap_rank %>
+                    </div>
+                    <div><img class="crypto-image" src="<%= arbitrum.image %>" alt="arbitrum-img"></div>
+                    <div>
+                        <%= arbitrum.name %>
+                    </div>
+                    <div class="coin-price">$<%= arbitrum.current_price %>
+                    </div>
+                </div>
+                <hr class="crypto-row">
+                <div class="each-box">
+                    <div>
+                        <%= optimism.market_cap_rank %>
+                    </div>
+                    <div><img class="crypto-image" src="<%= optimism.image %>" alt="optimism-img"></div>
+                    <div>
+                        <%= optimism.name %>
+                    </div>
+                    <div class="coin-price">$<%= optimism.current_price %>
+                    </div>
+                </div>
+                <hr class="crypto-row">
+                <div class="each-box">
+                    <div>
+                        <%= aleo.market_cap_rank %>
+                    </div>
+                    <div><img class="crypto-image" src="<%= aleo.image %>" alt="aleo-img"></div>
+                    <div>
+                        <%= aleo.name %>
+                    </div>
+                    <div class="coin-price">$<%= aleo.current_price %>
+                    </div>
+                </div>
+                <hr class="crypto-row">
+                <div class="each-box">
+                    <div>
+                        <%= celestia.market_cap_rank %>
+                    </div>
+                    <div><img class="crypto-image" src="<%= celestia.image %>" alt="celestia-img"></div>
+                    <div>
+                        <%= celestia.name %>
+                    </div>
+                    <div class="coin-price">$<%= celestia.current_price %>
+                    </div>
+                </div>
+                <hr class="crypto-row">
+                <div class="each-box">
+                    <div>
+                        <%= starknet.market_cap_rank %>
+                    </div>
+                    <div><img class="crypto-image" src="<%= starknet.image %>" alt="starknet-img"></div>
+                    <div>
+                        <%= starknet.name %>
+                    </div>
+                    <div class="coin-price">$<%= starknet.current_price %>
+                    </div>
+                </div>
+                
+
+            </div>
+          
+            
+        </div>
+
+      </div>
+    </div>
+
+<script>
+
+let data = [];
+async function fetchData(query) {
+  try {
+    const response = await fetch(`https://api.coingecko.com/api/v3/search?query=${query}`);
+    const jsonData = await response.json();
+    data = jsonData.coins;
+    filterResults();
+  } catch (error) {
+    console.error('Error fetching data from CoinGecko API:', error);
+  }
+}
+
+function myFunction() {
+const input = document.getElementById('search').value.toLowerCase();
+const suggestionsBox = document.getElementById('suggestions');
+suggestionsBox.innerHTML = '';
+
+  if (input) {
+    fetchData(input);
+
+    // Display suggestions after filtering the fetched data
+    if (data.length > 0) {
+      const filteredData = data.filter(item =>
+        item.name.toLowerCase().includes(input) || item.symbol.toLowerCase().includes(input)
+      );
+
+      filteredData.forEach(item => {
+        const suggestionItem = document.createElement('div');
+        suggestionItem.classList.add('suggestion');
+        const image = document.createElement('img');
+        image.classList.add("searchimage")
+        image.src = item.thumb; // Use the thumb property from the API for the image URL
+        image.alt = item.name;
+        image.width = 30; // Set the image width (you can adjust this)
+        image.height = 30; // Set the image height (you can adjust this)
+        image.style.marginRight = '10px'; // Add some margin between image and text
+
+        // Create a span element for the name and symbol text
+        const text = document.createElement('span');
+        text.textContent = `${item.name} (${item.symbol})`;
+
+        // Append the image and text to the suggestion item
+        suggestionItem.appendChild(image);
+        suggestionItem.appendChild(text);
+
+        // Add an onclick event to select the suggestion
+        suggestionItem.onclick = function() {
+          document.getElementById('search').value = `${item.name}`;
+          suggestionsBox.innerHTML = '';
+          suggestionsBox.style.display = 'none';
+        };
+
+        suggestionsBox.appendChild(suggestionItem);
+      });
+
+      suggestionsBox.style.display = 'block';
+    } else {
+      suggestionsBox.style.display = 'none';
+    }
+  } else {
+    suggestionsBox.style.display = 'none';
+  }
+}
+</script>
+
+</body>
+
+</html>
