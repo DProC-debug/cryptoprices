@@ -14,7 +14,7 @@
     "y": "^0.3.2"
   },
   "scripts": {
-    "start": "node index.ejs"
+    "start": "node index.js"
   },
   "name": "crypto-api",
   "type": "module",
