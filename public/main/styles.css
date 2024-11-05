@@ -172,7 +172,7 @@ h1, h2, h3, h4, h5, h6, p {
     background-color: #ececec;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 425px) {
     .circle-img {
         height: 100vh;
         width: 100vw;
