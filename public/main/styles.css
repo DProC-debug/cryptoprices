@@ -1,0 +1,358 @@
+body {
+    background-color: #ececec;
+    position: relative;
+}
+
+h1, h2, h3, h4, h5, h6, p {
+    font-family: "Ubuntu", sans-serif;
+    letter-spacing: 1px;
+    color: #181C14;
+}
+
+.circle-img {
+    position: absolute; 
+    left: 0; 
+    right: 0; 
+    margin-inline: auto;
+    height: 140vh;
+    z-index: -1;
+    margin: auto;
+}
+
+.cryptodetails {height: 100vh;}
+
+
+.crypto-box {
+    text-align: center;
+    padding: 10px 0;
+}
+
+
+.user-name {
+    font-size: 90px;
+    margin-bottom: 5px;
+}
+
+.pdiv {
+    background-color: #ececec;
+    width: max-content;
+    display: inline-block;
+}
+
+.crypto-p {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.twobox {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+    margin: 30px;
+}
+
+.cryptobox {
+    background-color: #ececec;
+    color: hsl(90, 17%, 9%);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    padding: 10px;
+}
+
+.crypto-row {border: 1.3px solid #181C14;}
+
+.each-box {
+    padding: 5px 35px;
+    font-size: 20px;
+    font-weight: bold;
+    display: grid;
+    grid-template-columns: 1fr 1fr 2fr 4fr;
+}
+
+
+.crypto-image {
+    height: 2cap;
+    aspect-ratio: 1;
+    vertical-align: middle;
+}
+
+.coin-price {
+    text-align: right;
+}
+
+.search-container {
+    position: relative;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    margin: 5vh 35vw;
+    border-radius: 20px;
+  }
+  
+  #search {
+    width: 100%;
+    padding: 15px;
+    font-size: 15px;
+    font-weight: bold;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    background-color: #f7f4f4;
+    color: #181C14;
+  }
+  
+  #suggestions {
+    border: 1px solid #ccc;
+    border-top: none;
+    position: absolute;
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    color: #181C14;
+    background-color: #ececec;
+    display: none;
+    z-index: 1;
+    text-align: left;
+  }
+
+  .searchimage {vertical-align: middle;}
+  
+  .suggestion {
+    padding: 10px;
+    cursor: pointer;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  
+  .suggestion:hover {
+    background-color: #f1f1f1;
+  }
+
+.cryptoinfo {
+    font-size: 20px;
+    margin: 4vw 10vw 0;
+    font-weight: bolder;
+}
+
+.cryptopic {
+    vertical-align: middle;
+    border-radius: 50px;
+    height: 50px;
+}
+
+.cryptotoken {
+    display: grid;
+    grid-template-columns: 4fr 4fr;
+    font-size: 50px;
+    text-align: left;
+}
+
+.cryptoprice {text-align: right;}
+
+.market {
+    display: grid;
+    grid-template-columns: 3fr 5fr;
+    margin-top: 2vh;
+}
+
+.otherinfo {
+    padding: 30px;
+    background-color: #181C14;
+    color: #f1f1f1;
+    border: 1px solid #f1f1f1;
+    border-radius: 10px;
+}
+
+.infobox {
+    display: grid;
+    grid-template-columns: 3fr 5fr;
+    padding: 20px 0;
+}
+
+.chart {
+    width: 800px;
+    height: 400px;
+    padding: 50px;
+    background-color: #ececec;
+}
+
+@media (max-width: 425px) {
+    .circle-img {
+        height: 100vh;
+        z-index: -1;
+        position: absolute; 
+        left: 0; 
+        right: 0; 
+        margin-inline: auto;
+        margin: auto;  
+    }
+
+    .twobox {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
+        margin: 20px;
+    }
+
+    .search-container {
+        position: relative;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+        margin: 2vh 3vw;
+        border-radius: 20px;
+      }
+
+    .user-name {
+        font-size: 20px;
+        margin-bottom: 5px;
+    }
+
+    .nomobile{
+        display: none;
+    }
+
+    .market {
+        display: grid;
+        grid-template-columns: 1fr;
+        margin-top: 2vh;
+    }
+
+    body {
+        background-color: #ececec;
+        position: relative;
+    }
+    
+    h1, h2, h3, h4, h5, h6, p {
+        font-family: "Ubuntu", sans-serif;
+        letter-spacing: 1px;
+        color: #181C14;
+    }
+    
+    
+    .cryptodetails {height: 100vh;}
+    
+    
+    .crypto-box {
+        text-align: center;
+        padding: 10px 0;
+    }
+    
+    
+    
+    
+    .pdiv {
+        background-color: #ececec;
+        width: max-content;
+        display: inline-block;
+    }
+    
+    .crypto-p {
+        font-size: 20px;
+        font-weight: bold;
+    }
+    
+    .cryptobox {
+        background-color: #ececec;
+        color: hsl(90, 17%, 9%);
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+        text-align: center;
+        padding: 10px;
+    }
+    
+    .crypto-row {border: 1.3px solid #181C14;}
+    
+    .each-box {
+        padding: 5px 35px;
+        font-size: 20px;
+        font-weight: bold;
+        display: grid;
+        grid-template-columns: 1fr 1fr 2fr 4fr;
+    }
+    
+    
+    .crypto-image {
+        height: 2cap;
+        aspect-ratio: 1;
+        vertical-align: middle;
+    }
+    
+    .coin-price {
+        text-align: right;
+    }
+      
+      #search {
+        width: 100%;
+        padding: 15px;
+        font-size: 15px;
+        font-weight: bold;
+        border: 1px solid #ccc;
+        border-radius: 20px;
+        background-color: #f7f4f4;
+        color: #181C14;
+      }
+      
+      #suggestions {
+        border: 1px solid #ccc;
+        border-top: none;
+        position: absolute;
+        width: 100%;
+        max-height: 200px;
+        overflow-y: auto;
+        color: #181C14;
+        background-color: #ececec;
+        display: none;
+        z-index: 1;
+        text-align: left;
+      }
+    
+      .searchimage {vertical-align: middle;}
+      
+      .suggestion {
+        padding: 10px;
+        cursor: pointer;
+        border-bottom: 1px solid #f0f0f0;
+      }
+      
+      .suggestion:hover {
+        background-color: #f1f1f1;
+      }
+    
+    .cryptoinfo {
+        font-size: 20px;
+        margin: 4vw 10vw 0;
+        font-weight: bolder;
+    }
+    
+    .cryptopic {
+        vertical-align: middle;
+        border-radius: 50px;
+        height: 50px;
+    }
+    
+    .cryptotoken {
+        display: grid;
+        grid-template-columns: 4fr 4fr;
+        font-size: 50px;
+        text-align: left;
+    }
+    
+    .cryptoprice {text-align: right;}
+    
+    
+    .otherinfo {
+        padding: 30px;
+        background-color: #181C14;
+        color: #f1f1f1;
+        border: 1px solid #f1f1f1;
+        border-radius: 10px;
+    }
+    
+    .infobox {
+        display: grid;
+        grid-template-columns: 3fr 5fr;
+        padding: 20px 0;
+    }
+    
+    .chart {
+        width: 800px;
+        height: 400px;
+        padding: 50px;
+        background-color: #ececec;
+    }
+    
+}
