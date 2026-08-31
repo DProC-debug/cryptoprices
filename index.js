@@ -4,12 +4,14 @@ import axios from "axios";
 import path from "path"
 import { dirname } from "path";
 import { fileURLToPath } from "url";
+import dotenv from "dotenv";
+dotenv.config();
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 const API_URL = "https://api.coingecko.com/api/v3/";
-const yourAPIKey = "CG-PekSWHNqhgaGHTHo9Cghy9TY";
+const yourAPIKey = process.env.API_KEY;
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
