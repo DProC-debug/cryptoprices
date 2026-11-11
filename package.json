@@ -29,5 +29,8 @@
   "bugs": {
     "url": "https://github.com/DProC-debug/cryptoprices/issues"
   },
-  "homepage": "https://github.com/DProC-debug/cryptoprices#readme"
+  "homepage": "https://github.com/DProC-debug/cryptoprices#readme",
+  "engines": {
+    "node": "24.x"
+  }
 }
