@@ -665,3 +665,25 @@ h1, h2, h3, h4, h5, h6, p {
         transition: none;
     }
 }
+
+/* ---------- Coin detail values ---------- */
+
+.value-note {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.65em;
+    font-weight: normal;
+    color: #b5b5b5;
+}
+
+.value-note.positive {
+    color: #5fd68b;
+}
+
+.value-note.negative {
+    color: #ff7a7a;
+}
+
+.infobox .cryptoprice[title] {
+    cursor: help;
+}

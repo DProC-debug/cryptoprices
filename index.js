@@ -3,6 +3,7 @@ import express from "express";
 import axios from "axios";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import * as format from "./lib/format.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -105,17 +106,13 @@ function toCoinId(input) {
   return input.trim().toLowerCase().replace(/\s+/g, "-");
 }
 
-function formatNumber(value) {
-  return value == null ? "N/A" : Number(value).toLocaleString("en-US");
-}
-
 // ---------- App setup ----------
 
 const app = express();
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
-app.locals.formatNumber = formatNumber;
+Object.assign(app.locals, format);
 
 app.use(express.static(path.join(__dirname, "public")));
 

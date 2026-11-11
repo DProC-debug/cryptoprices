@@ -35,42 +35,70 @@
                 <%= coin.name %>
             </div>
             
-            <div class="cryptoprice">$<%= coin.current_price %></div>
+            <div class="cryptoprice"><%= formatUsd(coin.current_price) %></div>
         </div>
         
         <div class="market">
             <div class="otherinfo">
+                <% const symbol = coin.symbol.toUpperCase(); %>
                 <div class="infobox">
                     <div>Market Cap</div>
-                    <div class="cryptoprice">$<%= formatNumber(coin.market_cap) %></div>
+                    <div class="cryptoprice" title="$<%= formatNumber(coin.market_cap) %>">
+                        <%= formatCompactUsd(coin.market_cap) %>
+                        <% if (coin.market_cap_rank) { %>
+                        <span class="value-note">Rank #<%= coin.market_cap_rank %></span>
+                        <% } %>
+                    </div>
                 </div>
                 <div class="infobox">
                     <div>Circulating Supply</div>
-                    <div class="cryptoprice"><%= formatNumber(coin.circulating_supply) %></div>
+                    <div class="cryptoprice" title="<%= formatNumber(coin.circulating_supply) %> <%= symbol %>">
+                        <%= formatCompactNumber(coin.circulating_supply) %> <%= symbol %>
+                    </div>
                 </div>
                 <div class="infobox">
                     <div>Total Supply</div>
-                    <div class="cryptoprice"><%= formatNumber(coin.total_supply) %></div>
+                    <div class="cryptoprice" title="<%= formatNumber(coin.total_supply) %> <%= symbol %>">
+                        <% if (coin.total_supply == null) { %>N/A<% } else { %><%= formatCompactNumber(coin.total_supply) %> <%= symbol %><% } %>
+                    </div>
                 </div>
                 <div class="infobox">
                     <div>All Time High</div>
-                    <div class="cryptoprice">$<%= coin.ath %></div>
+                    <div class="cryptoprice" title="<%= formatExactUsd(coin.ath) %>">
+                        <%= formatUsd(coin.ath) %>
+                        <% if (coin.ath_change_percentage != null) { %>
+                        <span class="value-note <%= changeClass(coin.ath_change_percentage) %>"><%= formatPercent(coin.ath_change_percentage) %> from ATH</span>
+                        <% } %>
+                    </div>
                 </div>
                 <div class="infobox">
                     <div>ATH Date</div>
-                    <div class="cryptoprice"><%= coin.ath_date %></div>
+                    <div class="cryptoprice" title="<%= coin.ath_date %>">
+                        <%= formatDate(coin.ath_date) %>
+                        <span class="value-note"><%= formatTimeAgo(coin.ath_date) %></span>
+                    </div>
                 </div>
                 <div class="infobox">
                     <div>All Time Low</div>
-                    <div class="cryptoprice">$<%= coin.atl %></div>
+                    <div class="cryptoprice" title="<%= formatExactUsd(coin.atl) %>">
+                        <%= formatUsd(coin.atl) %>
+                        <% if (coin.atl_change_percentage != null) { %>
+                        <span class="value-note <%= changeClass(coin.atl_change_percentage) %>"><%= formatPercent(coin.atl_change_percentage) %> from ATL</span>
+                        <% } %>
+                    </div>
                 </div>
                 <div class="infobox">
                     <div>ATL Date</div>
-                    <div class="cryptoprice"><%= coin.atl_date %></div>
+                    <div class="cryptoprice" title="<%= coin.atl_date %>">
+                        <%= formatDate(coin.atl_date) %>
+                        <span class="value-note"><%= formatTimeAgo(coin.atl_date) %></span>
+                    </div>
                 </div>
                 <div class="infobox">
-                    <div>FDV</div>
-                    <div class="cryptoprice">$<%= formatNumber(coin.fully_diluted_valuation) %></div>
+                    <div>Fully Diluted Valuation</div>
+                    <div class="cryptoprice" title="$<%= formatNumber(coin.fully_diluted_valuation) %>">
+                        <%= formatCompactUsd(coin.fully_diluted_valuation) %>
+                    </div>
                 </div>
             </div>
         
