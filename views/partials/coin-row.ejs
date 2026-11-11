@@ -1,4 +1,4 @@
-<div class="each-box">
+<a class="each-box coin-link" href="/search?search=<%= encodeURIComponent(coin.id) %>">
     <div>
         <%= coin.market_cap_rank %>
     </div>
@@ -8,4 +8,4 @@
     </div>
     <div class="coin-price">$<%= coin.current_price %>
     </div>
-</div>
+</a>

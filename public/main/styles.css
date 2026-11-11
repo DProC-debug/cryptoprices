@@ -501,5 +501,13 @@ h1, h2, h3, h4, h5, h6, p {
         padding: 50px;
         background-color: #ececec;
     }
-    
+
+.coin-link {
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.coin-link:hover {
+    background-color: rgba(24, 28, 20, 0.08);
 }
