@@ -36,10 +36,17 @@
         </div>
         
      <div class="search-container">
-        <form method="GET" action="/search">
-            <input name="search" id="search" placeholder="Search..." type="search" autocomplete="off" onkeyup="myFunction()">
+        <form class="search-form" method="GET" action="/search" role="search" autocomplete="off">
+            <i class="bi bi-search search-icon" aria-hidden="true"></i>
+            <input name="search" id="search" type="search" placeholder="Search any coin, e.g. Bitcoin or SOL"
+                aria-label="Search coins" role="combobox" aria-autocomplete="list" aria-expanded="false"
+                aria-controls="suggestions" spellcheck="false">
+            <span class="search-spinner" aria-hidden="true" hidden></span>
+            <button class="search-button" type="submit" aria-label="Search">
+                <i class="bi bi-arrow-right" aria-hidden="true"></i>
+            </button>
         </form>
-        <div id="suggestions"></div>
+        <ul id="suggestions" role="listbox" aria-label="Coin suggestions"></ul>
      </div>
 
       <% const half = Math.ceil(coins.length / 2); %>
@@ -82,72 +89,7 @@
       </div>
     </div>
 
-<script>
-
-let data = [];
-async function fetchData(query) {
-  try {
-    const response = await fetch(`https://api.coingecko.com/api/v3/search?query=${query}`);
-    const jsonData = await response.json();
-    data = jsonData.coins;
-    filterResults();
-  } catch (error) {
-    console.error('Error fetching data from CoinGecko API:', error);
-  }
-}
-
-function myFunction() {
-const input = document.getElementById('search').value.toLowerCase();
-const suggestionsBox = document.getElementById('suggestions');
-suggestionsBox.innerHTML = '';
-
-  if (input) {
-    fetchData(input);
-
-    // Display suggestions after filtering the fetched data
-    if (data.length > 0) {
-      const filteredData = data.filter(item =>
-        item.name.toLowerCase().includes(input) || item.symbol.toLowerCase().includes(input)
-      );
-
-      filteredData.forEach(item => {
-        const suggestionItem = document.createElement('div');
-        suggestionItem.classList.add('suggestion');
-        const image = document.createElement('img');
-        image.classList.add("searchimage")
-        image.src = item.thumb; // Use the thumb property from the API for the image URL
-        image.alt = item.name;
-        image.width = 30; // Set the image width (you can adjust this)
-        image.height = 30; // Set the image height (you can adjust this)
-        image.style.marginRight = '10px'; // Add some margin between image and text
-
-        // Create a span element for the name and symbol text
-        const text = document.createElement('span');
-        text.textContent = `${item.name} (${item.symbol})`;
-
-        // Append the image and text to the suggestion item
-        suggestionItem.appendChild(image);
-        suggestionItem.appendChild(text);
-
-        // Add an onclick event to select the suggestion
-        suggestionItem.onclick = function() {
-          document.getElementById('search').value = `${item.name}`;
-          suggestionsBox.innerHTML = '';
-          suggestionsBox.style.display = 'none';
-        };
-
-        suggestionsBox.appendChild(suggestionItem);
-      });
-
-      suggestionsBox.style.display = 'block';
-    } else {
-      suggestionsBox.style.display = 'none';
-    }
-  } else {
-    suggestionsBox.style.display = 'none';
-  }
-}
-</script>
+<script src="/main/search.js" defer></script>
 
 </body>
 

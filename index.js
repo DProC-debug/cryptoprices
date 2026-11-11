@@ -37,6 +37,11 @@ const TRACKED_COINS = [
 // CoinGecko IDs are lowercase letters, digits and hyphens.
 const COIN_ID_PATTERN = /^[a-z0-9-]+$/;
 
+const MAX_SUGGESTIONS = 8;
+const MAX_QUERY_LENGTH = 50;
+const SEARCH_CACHE_TTL_MS = 5 * 60 * 1000;
+const SEARCH_CACHE_MAX_ENTRIES = 500;
+
 const coingecko = axios.create({
   baseURL: "https://api.coingecko.com/api/v3",
   headers: process.env.API_KEY ? { "x-cg-demo-api-key": process.env.API_KEY } : {},
@@ -63,6 +68,30 @@ async function fetchPriceHistory(coinId) {
     if (error.response?.status === 404) return null;
     throw error;
   }
+}
+
+// Small in-memory cache so typing in the search box doesn't burn through the API rate limit.
+const searchCache = new Map();
+
+async function searchCoins(query) {
+  const cacheKey = query.toLowerCase();
+  const cached = searchCache.get(cacheKey);
+  if (cached && cached.expiresAt > Date.now()) return cached.coins;
+
+  const { data } = await coingecko.get("/search", { params: { query } });
+  const coins = data.coins.slice(0, MAX_SUGGESTIONS).map(({ id, name, symbol, thumb, market_cap_rank }) => ({
+    id,
+    name,
+    symbol,
+    thumb,
+    rank: market_cap_rank,
+  }));
+
+  if (searchCache.size >= SEARCH_CACHE_MAX_ENTRIES) {
+    searchCache.delete(searchCache.keys().next().value);
+  }
+  searchCache.set(cacheKey, { coins, expiresAt: Date.now() + SEARCH_CACHE_TTL_MS });
+  return coins;
 }
 
 function byMarketCapRank(a, b) {
@@ -138,6 +167,24 @@ app.get("/search", async (req, res, next) => {
   }
 });
 
+// JSON endpoint behind the search box's live suggestions.
+app.get("/api/search", async (req, res, next) => {
+  const query = typeof req.query.q === "string" ? req.query.q.trim() : "";
+
+  if (!query) {
+    return res.json({ coins: [] });
+  }
+  if (query.length > MAX_QUERY_LENGTH) {
+    return res.status(400).json({ error: `Query must be at most ${MAX_QUERY_LENGTH} characters.` });
+  }
+
+  try {
+    res.json({ coins: await searchCoins(query) });
+  } catch (error) {
+    next(error);
+  }
+});
+
 function renderCoinNotFound(res, query) {
   res.status(404).render("error", {
     title: "Coin not found",
@@ -147,11 +194,17 @@ function renderCoinNotFound(res, query) {
 
 // ---------- 404 & error handling ----------
 
+// API routes get JSON errors; pages get the HTML error view.
+function sendError(req, res, status, title, message) {
+  res.status(status);
+  if (req.path.startsWith("/api/")) {
+    return res.json({ error: message });
+  }
+  res.render("error", { title, message });
+}
+
 app.use((req, res) => {
-  res.status(404).render("error", {
-    title: "Page not found",
-    message: "The page you're looking for doesn't exist.",
-  });
+  sendError(req, res, 404, "Page not found", "The page you're looking for doesn't exist.");
 });
 
 app.use((error, req, res, next) => {
@@ -174,23 +227,16 @@ app.use((error, req, res, next) => {
   }
 
   if (isUpstreamError && upstreamStatus === 429) {
-    return res.status(503).render("error", {
-      title: "Too many requests",
-      message: "The price service is busy right now. Please try again in a minute.",
-    });
+    return sendError(req, res, 503, "Too many requests",
+      "The price service is busy right now. Please try again in a minute.");
   }
 
   if (isUpstreamError) {
-    return res.status(502).render("error", {
-      title: "Prices unavailable",
-      message: "We couldn't reach the price service. Please try again shortly.",
-    });
+    return sendError(req, res, 502, "Prices unavailable",
+      "We couldn't reach the price service. Please try again shortly.");
   }
 
-  res.status(500).render("error", {
-    title: "Something went wrong",
-    message: "An unexpected error occurred. Please try again.",
-  });
+  sendError(req, res, 500, "Something went wrong", "An unexpected error occurred. Please try again.");
 });
 
 app.listen(PORT, () => {

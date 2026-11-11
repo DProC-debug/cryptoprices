@@ -33,5 +33,6 @@ The app runs at http://localhost:3000 (or the `PORT` set in `.env`). Get a free 
 | ------ | --------------------------- | ------------------------------------------------------------------ |
 | GET    | `/`                         | Prices for the tracked coins, sorted by market cap rank            |
 | GET    | `/search?search=<coin-id>`  | Market data and price chart for one coin (e.g. `bitcoin`)          |
+| GET    | `/api/search?q=<text>`      | JSON coin suggestions for the search box (cached for 5 minutes)    |
 
 Unknown coins return a 404 page. If CoinGecko is unreachable the app returns 502 (or 503 when rate-limited) with a friendly error page.
