@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crypto Prices</title>
+    <title><%= coin.name %> (<%= coin.symbol.toUpperCase() %>) | Crypto Prices</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,35 +12,33 @@
         href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap"
         rel="stylesheet">
 
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
-        crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
-        integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
-        crossorigin="anonymous"></script>
-
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="/main/styles.css">
 </head>
 
 <body>
-    <img class="circle-img cryptodetails" src="https://aleo.org/homepage.png" alt="circle">
-    <div class="cryptoinfo">
+    <img class="circle-img cryptodetails" src="https://aleo.org/homepage.png" alt="">
+    <main class="cryptoinfo">
+        <a class="back-link" href="/"><i class="bi bi-arrow-left" aria-hidden="true"></i> All prices</a>
+
+        <% const symbol = coin.symbol.toUpperCase(); %>
         <div class="cryptotoken">
-            <div>
-                <img class="cryptopic" src="<%= coin.image %>" alt="crypto-img">
-                <%= coin.name %>
+            <div class="coin-title">
+                <img class="cryptopic" src="<%= coin.image %>" alt="">
+                <span><%= coin.name %></span>
+                <span class="coin-symbol"><%= symbol %></span>
             </div>
-            
-            <div class="cryptoprice"><%= formatUsd(coin.current_price) %></div>
+
+            <div class="cryptoprice">
+                <%= formatUsd(coin.current_price) %>
+                <% if (coin.price_change_percentage_24h != null) { %>
+                <span class="value-note <%= changeClass(coin.price_change_percentage_24h) %>"><%= formatPercent(coin.price_change_percentage_24h) %> (24h)</span>
+                <% } %>
+            </div>
         </div>
-        
+
         <div class="market">
-            <div class="otherinfo">
-                <% const symbol = coin.symbol.toUpperCase(); %>
+            <section class="otherinfo" aria-label="Market data">
                 <div class="infobox">
                     <div>Market Cap</div>
                     <div class="cryptoprice" title="$<%= formatNumber(coin.market_cap) %>">
@@ -100,49 +98,34 @@
                         <%= formatCompactUsd(coin.fully_diluted_valuation) %>
                     </div>
                 </div>
-            </div>
-        
-            
-                <div class="chart">
-                    <h1><%= coin.id.toUpperCase() %> Price over the Last <%= dates.length-1 %> Day</h1>
-                    <canvas id="cryptoChart" width="800" height="400"></canvas>
-                </div>
-        </div> 
-    </div>
-    
+            </section>
 
-    <script>
-        // Initialize Chart.js to render the chart
-        const ctx = document.getElementById('cryptoChart').getContext('2d');
-        const cryptoChart = new Chart(ctx, {
-          type: 'line',
-          data: {
-            labels: <%- JSON.stringify(dates) %>,
-            datasets: [{
-              label: '<%= coin.id.toUpperCase() %> Price in <%= vsCurrency.toUpperCase() %>',
-              data: <%- JSON.stringify(prices) %>,
-              borderColor: '#181c14',
-              fill: true,
-              tension: 0.1
-            }]
-          },
-          options: {
-            responsive: true,
-            scales: {
-              x: {
-                title: {
-                  display: true,
-                  text: 'Date',
-                },
-              },
-              y: {
-                title: {
-                  display: true,
-                  text: 'Price (<%= vsCurrency.toUpperCase() %>)',
-                },
-              },
-            },
-          }
-        });
-      </script>
+            <section class="chart" aria-label="<%= coin.name %> price chart">
+                <div class="chart-header">
+                    <div>
+                        <h2 class="chart-title"><%= symbol %> / USD</h2>
+                        <span class="chart-change" id="chart-change"></span>
+                    </div>
+                    <div class="range-group" role="group" aria-label="Chart range">
+                        <% chartRanges.forEach(({ days, label }) => { %>
+                        <button type="button" class="range-button" data-days="<%= days %>"
+                            aria-pressed="<%= days === chart.days %>"><%= label %></button>
+                        <% }) %>
+                    </div>
+                </div>
+                <div class="chart-canvas-wrap">
+                    <canvas id="cryptoChart" role="img" aria-label="<%= coin.name %> price in US dollars"></canvas>
+                    <p class="chart-status" id="chart-status" role="status" hidden></p>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script type="application/json" id="chart-data"><%- JSON.stringify(chart).replace(/</g, "\\u003c") %></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.js"
+        integrity="sha384-G436+Z2nlA8+PNoeRvWdxKbvOf8E/y+lYxqht2iBwNHTQDV5CJr3+AGVj8fGZi5t"
+        crossorigin="anonymous" defer></script>
+    <script src="/main/chart.js" defer></script>
 </body>
+
+</html>

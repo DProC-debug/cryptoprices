@@ -4,12 +4,23 @@ import axios from "axios";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as format from "./lib/format.js";
+import { createTtlCache } from "./lib/cache.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const PORT = process.env.PORT || 3000;
 const VS_CURRENCY = "usd";
-const CHART_DAYS = 1;
+
+// Chart ranges offered on the coin page (CoinGecko `days` values).
+const CHART_RANGES = [
+  { days: 1, label: "24H" },
+  { days: 7, label: "7D" },
+  { days: 30, label: "1M" },
+  { days: 90, label: "3M" },
+  { days: 365, label: "1Y" },
+];
+const DEFAULT_CHART_DAYS = 7;
+const ALLOWED_CHART_DAYS = new Set(CHART_RANGES.map(({ days }) => days));
 
 // CoinGecko coin IDs shown on the home page.
 const TRACKED_COINS = [
@@ -40,8 +51,10 @@ const COIN_ID_PATTERN = /^[a-z0-9-]+$/;
 
 const MAX_SUGGESTIONS = 8;
 const MAX_QUERY_LENGTH = 50;
-const SEARCH_CACHE_TTL_MS = 5 * 60 * 1000;
-const SEARCH_CACHE_MAX_ENTRIES = 500;
+
+// Caches keep repeated searches and chart range switches from burning through the API rate limit.
+const searchCache = createTtlCache({ ttlMs: 5 * 60 * 1000 });
+const chartCache = createTtlCache({ ttlMs: 2 * 60 * 1000 });
 
 const coingecko = axios.create({
   baseURL: "https://api.coingecko.com/api/v3",
@@ -58,41 +71,33 @@ async function fetchMarkets(coinIds) {
   return data;
 }
 
-// Resolves to null when CoinGecko doesn't know the coin.
-async function fetchPriceHistory(coinId) {
-  try {
-    const { data } = await coingecko.get(`/coins/${encodeURIComponent(coinId)}/market_chart`, {
-      params: { vs_currency: VS_CURRENCY, days: CHART_DAYS, interval: "daily" },
-    });
-    return data;
-  } catch (error) {
-    if (error.response?.status === 404) return null;
-    throw error;
-  }
+// Price points as [timestamp, price] pairs, or null when CoinGecko doesn't know the coin.
+// Granularity is chosen by CoinGecko: 5-minute for 1 day, hourly up to 90 days, daily beyond.
+function fetchPriceHistory(coinId, days) {
+  return chartCache.getOrLoad(`${coinId}:${days}`, async () => {
+    try {
+      const { data } = await coingecko.get(`/coins/${encodeURIComponent(coinId)}/market_chart`, {
+        params: { vs_currency: VS_CURRENCY, days },
+      });
+      return data.prices;
+    } catch (error) {
+      if (error.response?.status === 404) return null;
+      throw error;
+    }
+  });
 }
 
-// Small in-memory cache so typing in the search box doesn't burn through the API rate limit.
-const searchCache = new Map();
-
-async function searchCoins(query) {
-  const cacheKey = query.toLowerCase();
-  const cached = searchCache.get(cacheKey);
-  if (cached && cached.expiresAt > Date.now()) return cached.coins;
-
-  const { data } = await coingecko.get("/search", { params: { query } });
-  const coins = data.coins.slice(0, MAX_SUGGESTIONS).map(({ id, name, symbol, thumb, market_cap_rank }) => ({
-    id,
-    name,
-    symbol,
-    thumb,
-    rank: market_cap_rank,
-  }));
-
-  if (searchCache.size >= SEARCH_CACHE_MAX_ENTRIES) {
-    searchCache.delete(searchCache.keys().next().value);
-  }
-  searchCache.set(cacheKey, { coins, expiresAt: Date.now() + SEARCH_CACHE_TTL_MS });
-  return coins;
+function searchCoins(query) {
+  return searchCache.getOrLoad(query.toLowerCase(), async () => {
+    const { data } = await coingecko.get("/search", { params: { query } });
+    return data.coins.slice(0, MAX_SUGGESTIONS).map(({ id, name, symbol, thumb, market_cap_rank }) => ({
+      id,
+      name,
+      symbol,
+      thumb,
+      rank: market_cap_rank,
+    }));
+  });
 }
 
 function byMarketCapRank(a, b) {
@@ -140,25 +145,44 @@ app.get("/search", async (req, res, next) => {
   }
 
   try {
-    const [markets, history] = await Promise.all([
+    const [markets, prices] = await Promise.all([
       fetchMarkets([coinId]),
-      fetchPriceHistory(coinId),
+      fetchPriceHistory(coinId, DEFAULT_CHART_DAYS),
     ]);
 
     const coin = markets[0];
-    if (!coin || !history) {
+    if (!coin || !prices) {
       return renderCoinNotFound(res, query.trim());
     }
 
-    const dates = history.prices.map(([timestamp]) => new Date(timestamp).toISOString().split("T")[0]);
-    const prices = history.prices.map(([, price]) => price);
-
     res.render("cryptoinfo", {
       coin,
-      dates,
-      prices,
-      vsCurrency: VS_CURRENCY,
+      chart: { coinId: coin.id, days: DEFAULT_CHART_DAYS, prices },
+      chartRanges: CHART_RANGES,
     });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// JSON price history for the chart's range buttons.
+app.get("/api/coins/:id/market-chart", async (req, res, next) => {
+  const coinId = req.params.id;
+  const days = Number(req.query.days ?? DEFAULT_CHART_DAYS);
+
+  if (!COIN_ID_PATTERN.test(coinId)) {
+    return res.status(400).json({ error: "Invalid coin ID." });
+  }
+  if (!ALLOWED_CHART_DAYS.has(days)) {
+    return res.status(400).json({ error: `days must be one of: ${[...ALLOWED_CHART_DAYS].join(", ")}.` });
+  }
+
+  try {
+    const prices = await fetchPriceHistory(coinId, days);
+    if (!prices) {
+      return res.status(404).json({ error: "Coin not found." });
+    }
+    res.json({ coinId, days, prices });
   } catch (error) {
     next(error);
   }

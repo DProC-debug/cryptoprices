@@ -1,11 +1,11 @@
 <a class="each-box coin-link" href="/search?search=<%= encodeURIComponent(coin.id) %>">
-    <div>
-        <%= coin.market_cap_rank %>
+    <div class="coin-rank">
+        <%= coin.market_cap_rank ?? "–" %>
     </div>
-    <div><img class="crypto-image" src="<%= coin.image %>" alt="<%= coin.symbol %>-img"></div>
-    <div>
+    <div><img class="crypto-image" src="<%= coin.image %>" alt=""></div>
+    <div class="coin-name">
         <%= coin.name %>
     </div>
-    <div class="coin-price">$<%= coin.current_price %>
+    <div class="coin-price"><%= formatUsd(coin.current_price) %>
     </div>
 </a>
