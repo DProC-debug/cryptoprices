@@ -31,52 +31,52 @@
     <div class="cryptoinfo">
         <div class="cryptotoken">
             <div>
-                <img class="cryptopic" src="<%= searchresult.image %>" alt="crypto-img">
-                <%= searchresult.name %>
+                <img class="cryptopic" src="<%= coin.image %>" alt="crypto-img">
+                <%= coin.name %>
             </div>
             
-            <div class="cryptoprice">$<%= searchresult.current_price %></div>
+            <div class="cryptoprice">$<%= coin.current_price %></div>
         </div>
         
         <div class="market">
             <div class="otherinfo">
                 <div class="infobox">
                     <div>Market Cap</div>
-                    <div class="cryptoprice">$<%- numberWithCommas(searchresult.market_cap) %></div>
+                    <div class="cryptoprice">$<%= formatNumber(coin.market_cap) %></div>
                 </div>
                 <div class="infobox">
                     <div>Circulating Supply</div>
-                    <div class="cryptoprice"><%- numberWithCommas(searchresult.circulating_supply) %></div>
+                    <div class="cryptoprice"><%= formatNumber(coin.circulating_supply) %></div>
                 </div>
                 <div class="infobox">
                     <div>Total Supply</div>
-                    <div class="cryptoprice"><%- numberWithCommas(searchresult.total_supply) %></div>
+                    <div class="cryptoprice"><%= formatNumber(coin.total_supply) %></div>
                 </div>
                 <div class="infobox">
                     <div>All Time High</div>
-                    <div class="cryptoprice">$<%= searchresult.ath %></div>
+                    <div class="cryptoprice">$<%= coin.ath %></div>
                 </div>
                 <div class="infobox">
                     <div>ATH Date</div>
-                    <div class="cryptoprice"><%= searchresult.ath_date %></div>
+                    <div class="cryptoprice"><%= coin.ath_date %></div>
                 </div>
                 <div class="infobox">
                     <div>All Time Low</div>
-                    <div class="cryptoprice">$<%= searchresult.atl %></div>
+                    <div class="cryptoprice">$<%= coin.atl %></div>
                 </div>
                 <div class="infobox">
                     <div>ATL Date</div>
-                    <div class="cryptoprice"><%= searchresult.atl_date %></div>
+                    <div class="cryptoprice"><%= coin.atl_date %></div>
                 </div>
                 <div class="infobox">
                     <div>FDV</div>
-                    <div class="cryptoprice">$<%- numberWithCommas(searchresult.fully_diluted_valuation) %></div>
+                    <div class="cryptoprice">$<%= formatNumber(coin.fully_diluted_valuation) %></div>
                 </div>
             </div>
         
             
                 <div class="chart">
-                    <h1><%= cryptoId.toUpperCase() %> Price over the Last <%= dates.length-1 %> Day</h1>
+                    <h1><%= coin.id.toUpperCase() %> Price over the Last <%= dates.length-1 %> Day</h1>
                     <canvas id="cryptoChart" width="800" height="400"></canvas>
                 </div>
         </div> 
@@ -89,10 +89,10 @@
         const cryptoChart = new Chart(ctx, {
           type: 'line',
           data: {
-            labels: `<%= dates %>`,
+            labels: <%- JSON.stringify(dates) %>,
             datasets: [{
-              label: '<%= cryptoId.toUpperCase() %> Price in <%= vsCurrency.toUpperCase() %>',
-              data: `<%= prices %>`,
+              label: '<%= coin.id.toUpperCase() %> Price in <%= vsCurrency.toUpperCase() %>',
+              data: <%- JSON.stringify(prices) %>,
               borderColor: '#181c14',
               fill: true,
               tension: 0.1

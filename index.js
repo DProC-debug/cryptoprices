@@ -1,154 +1,200 @@
+import "dotenv/config";
 import express from "express";
-import bodyParser from "body-parser";
 import axios from "axios";
-import path from "path"
-import { dirname } from "path";
-import { fileURLToPath } from "url";
-import dotenv from "dotenv";
-dotenv.config();
-const __dirname = dirname(fileURLToPath(import.meta.url));
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+const PORT = process.env.PORT || 3000;
+const VS_CURRENCY = "usd";
+const CHART_DAYS = 1;
+
+// CoinGecko coin IDs shown on the home page.
+const TRACKED_COINS = [
+  "bitcoin",
+  "ethereum",
+  "solana",
+  "layerzero",
+  "bonk",
+  "notcoin",
+  "catizen",
+  "popcat",
+  "zetachain",
+  "neiro",
+  "aptos",
+  "sui",
+  "pepe",
+  "bittensor",
+  "tether",
+  "arbitrum",
+  "optimism",
+  "aleo",
+  "celestia",
+  "starknet",
+];
+
+// CoinGecko IDs are lowercase letters, digits and hyphens.
+const COIN_ID_PATTERN = /^[a-z0-9-]+$/;
+
+const coingecko = axios.create({
+  baseURL: "https://api.coingecko.com/api/v3",
+  headers: process.env.API_KEY ? { "x-cg-demo-api-key": process.env.API_KEY } : {},
+  timeout: 10_000,
+});
+
+// ---------- CoinGecko helpers ----------
+
+async function fetchMarkets(coinIds) {
+  const { data } = await coingecko.get("/coins/markets", {
+    params: { vs_currency: VS_CURRENCY, ids: coinIds.join(",") },
+  });
+  return data;
+}
+
+// Resolves to null when CoinGecko doesn't know the coin.
+async function fetchPriceHistory(coinId) {
+  try {
+    const { data } = await coingecko.get(`/coins/${encodeURIComponent(coinId)}/market_chart`, {
+      params: { vs_currency: VS_CURRENCY, days: CHART_DAYS, interval: "daily" },
+    });
+    return data;
+  } catch (error) {
+    if (error.response?.status === 404) return null;
+    throw error;
+  }
+}
+
+function byMarketCapRank(a, b) {
+  const rankA = a.market_cap_rank ?? Number.MAX_SAFE_INTEGER;
+  const rankB = b.market_cap_rank ?? Number.MAX_SAFE_INTEGER;
+  return rankA - rankB;
+}
+
+// Turns user input such as " Shiba Inu " into a CoinGecko-style ID ("shiba-inu").
+function toCoinId(input) {
+  return input.trim().toLowerCase().replace(/\s+/g, "-");
+}
+
+function formatNumber(value) {
+  return value == null ? "N/A" : Number(value).toLocaleString("en-US");
+}
+
+// ---------- App setup ----------
 
 const app = express();
-const port = process.env.PORT || 3000;
-const API_URL = "https://api.coingecko.com/api/v3/";
-const yourAPIKey = process.env.API_KEY;
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
-app.set("public", path.join(__dirname, "public"));
-app.use(express.static("public"));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.locals.formatNumber = formatNumber;
 
+app.use(express.static(path.join(__dirname, "public")));
 
-app.get("/",  async (req, res) => {
+// ---------- Routes ----------
+
+app.get("/", async (req, res, next) => {
+  try {
+    const coins = (await fetchMarkets(TRACKED_COINS)).sort(byMarketCapRank);
+    res.render("index", { coins });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.get("/search", async (req, res, next) => {
+  const query = typeof req.query.search === "string" ? req.query.search : "";
+  const coinId = toCoinId(query);
+
+  if (!coinId) {
+    return res.redirect("/");
+  }
+
+  if (!COIN_ID_PATTERN.test(coinId)) {
+    return renderCoinNotFound(res, query.trim());
+  }
 
   try {
-    const response = await axios.get(`${API_URL}coins/markets`, {
-      auth: {
-        key: "x-cg-demo-api-key",
-        value: yourAPIKey,
-      },
-      params: {
-        vs_currency: "usd",
-        ids: "bitcoin, ethereum, solana, layerzero, bonk, notcoin, catizen, popcat, zetachain, neiro, aptos, sui, pepe, bittensor, tether, arbitrum, optimism, aleo, celestia, starknet",
-    },
-  });
-    const result = response.data;
-    const bit_coin = (result)[0];
-    const eth = (result)[1];
-    const sol = (result)[2];
-    const zro = (result)[3];
-    const bonk = (result)[4];
-    const not = (result)[5];
-    const cati = (result)[6];
-    const popcat = (result)[7];
-    const zeta = (result)[8];
-    const neiro = (result)[9];
-    const aptos = (result)[10];
-    const sui = (result)[11];
-    const pepe = (result)[12];
-    const bittensor = (result)[13];
-    const tether = (result)[14];
-    const arbitrum = (result)[15];
-    const optimism = (result)[16];
-    const aleo = (result)[17];
-    const celestia = (result)[18];
-    const starknet = (result)[19];
-    res.render("index.ejs", { 
-      bitcoin: bit_coin,
-      ethereum: eth,
-      solana: sol,
-      zero: zro,
-      bonkinu: bonk,
-      notcoin: not,
-      catizen: cati,
-      pop: popcat,
-      zetachain: zeta,
-      neirocoin: neiro,
-      aptos: aptos,
-      sui: sui,
-      pepe: pepe,
-      bittensor: bittensor,
-      tether: tether,
-      arbitrum: arbitrum,
-      optimism: optimism,
-      aleo: aleo,
-      celestia: celestia,
-      starknet: starknet,
+    const [markets, history] = await Promise.all([
+      fetchMarkets([coinId]),
+      fetchPriceHistory(coinId),
+    ]);
+
+    const coin = markets[0];
+    if (!coin || !history) {
+      return renderCoinNotFound(res, query.trim());
+    }
+
+    const dates = history.prices.map(([timestamp]) => new Date(timestamp).toISOString().split("T")[0]);
+    const prices = history.prices.map(([, price]) => price);
+
+    res.render("cryptoinfo", {
+      coin,
+      dates,
+      prices,
+      vsCurrency: VS_CURRENCY,
     });
   } catch (error) {
-    res.status(404).send(error.message);
+    next(error);
   }
-
 });
 
-app.get("/search", async (req, res) => {
-const searchquery = req.query.search.toLowerCase();
-
-const cryptoId = searchquery;  // You can change this to other cryptocurrencies like 'ethereum'
-const vsCurrency = 'usd';    // You can change this to other fiat currencies like 'eur', 'jpy'
-const days = '1';           // Last 30 days of data
-
-
-if (!searchquery) {
-  res.json(404, "Input Value")
+function renderCoinNotFound(res, query) {
+  res.status(404).render("error", {
+    title: "Coin not found",
+    message: `We couldn't find a coin matching "${query}". Try its CoinGecko ID, e.g. "bitcoin" or "shiba-inu".`,
+  });
 }
 
-  try {
-    const response = await axios.get(`${API_URL}coins/markets?vs_currency=usd&ids=${searchquery}`, {
-      auth: {
-        key: "x-cg-demo-api-key",
-        value: yourAPIKey,
-      },
+// ---------- 404 & error handling ----------
+
+app.use((req, res) => {
+  res.status(404).render("error", {
+    title: "Page not found",
+    message: "The page you're looking for doesn't exist.",
   });
+});
 
+app.use((error, req, res, next) => {
+  const isUpstreamError = axios.isAxiosError(error);
+  const upstreamStatus = error.response?.status;
 
-  async function getCryptoPrice(cryptoId, vsCurrency, days) {
-    const url = `https://api.coingecko.com/api/v3/coins/${cryptoId}/market_chart`;
-    const params = {
-        vs_currency: vsCurrency,
-        days: days,
-        interval: 'daily',
-    };
-  
-    try {
-        const response = await axios.get(url, { params });
-        return response.data;
-    } catch (error) {
-        console.error('Error fetching data from CoinGecko:', error);
-        throw error;
-    }
+  // Log a summary only: axios errors carry the request config, including the API key header.
+  if (isUpstreamError) {
+    console.error(
+      `[${req.method} ${req.originalUrl}] CoinGecko request failed:`,
+      upstreamStatus ?? error.code,
+      error.message,
+    );
+  } else {
+    console.error(`[${req.method} ${req.originalUrl}]`, error);
   }
 
+  if (res.headersSent) {
+    return next(error);
+  }
 
-    // Fetch data from CoinGecko
-    const data = await getCryptoPrice(cryptoId, vsCurrency, days);
-
-    // Extract prices and dates from the response
-    const prices = data.prices.map(price => price[1]);
-    const dates = data.prices.map(price => {
-        const date = new Date(price[0]);
-        return date.toISOString().split('T')[0]; // Format date as 'YYYY-MM-DD'
+  if (isUpstreamError && upstreamStatus === 429) {
+    return res.status(503).render("error", {
+      title: "Too many requests",
+      message: "The price service is busy right now. Please try again in a minute.",
     });
+  }
 
+  if (isUpstreamError) {
+    return res.status(502).render("error", {
+      title: "Prices unavailable",
+      message: "We couldn't reach the price service. Please try again shortly.",
+    });
+  }
 
-  const result = (response.data)[0];
-  res.render("cryptoinfo.ejs", {
-    searchresult: result,
-    numberWithCommas: function (x) {
-      return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    },
-    dates: dates,
-    prices: prices,
-    cryptoId: cryptoId,
-    vsCurrency: vsCurrency,
+  res.status(500).render("error", {
+    title: "Something went wrong",
+    message: "An unexpected error occurred. Please try again.",
   });
-} catch (error) {
-  res.status(404).send(error.message);
-}
 });
 
-app.listen(port, () => {
-    console.log(`API is running at http://localhost:${port}`);
-  });
+app.listen(PORT, () => {
+  console.log(`Server running at http://localhost:${PORT}`);
+});
+
+export default app;
